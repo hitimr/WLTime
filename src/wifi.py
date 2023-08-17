@@ -13,10 +13,7 @@ def connect_to_wifi():
         sta_if.connect(SSID, PASSWORD)
         
         # Wait for the connection to complete
-        start_time = time.monotonic()
         while not sta_if.isconnected():
             time.sleep(0.1)
-            if time.monotonic() - start_time > CONNECTION_TIMEOUT:
-                raise TimeoutError("Connection to WiFi timed out.")
     
     print('network config:', sta_if.ifconfig())

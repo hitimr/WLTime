@@ -50,7 +50,7 @@ def to_series(line):
     ret = {
         "name": line["name"],
         "countdown": line["departures"]["departure"][0]["departureTime"]["countdown"],
-        "outwards": get_direction(line)
+        "direction": get_direction(line)
     }
     return ret
 
