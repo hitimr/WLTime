@@ -3,16 +3,17 @@ try:
 except ImportError:
     import urequests as requests
 
+
 def generate_url():
     # website for stations: https://till.mabe.at/rbl/?line=508&station=62517
 
     # Base URL
     url = "http://www.wienerlinien.at/ogd_realtime/monitor?"
 
-    url += "stopId=1718&" # WLB, 62 Aßmayergasse -> Baden Josephplatz 
-    url += "stopId=1748&" # WLB, 62 Aßmayergasse -> Wien Oper
-    url += "stopId=1692&" # 59A Aßmayergasse -> Bhf Meidling S U
-    url += "stopId=1693&" # 59A Aßmayergasse -> Oper, Karlsplatz
+    url += "stopId=1718&"  # WLB, 62 Aßmayergasse -> Baden Josephplatz
+    url += "stopId=1748&"  # WLB, 62 Aßmayergasse -> Wien Oper
+    url += "stopId=1692&"  # 59A Aßmayergasse -> Bhf Meidling S U
+    url += "stopId=1693&"  # 59A Aßmayergasse -> Oper, Karlsplatz
     url += "stopId=1708&"
 
     # Options
@@ -23,6 +24,7 @@ def generate_url():
     url += "sender=hiti"
 
     return url
+
 
 def request_data():
     r = requests.get(generate_url())
@@ -46,13 +48,15 @@ def get_direction(line):
     else:
         return "center"
 
+
 def to_series(line):
     ret = {
         "name": line["name"],
-        "countdown": line["departures"]["departure"][0]["departureTime"]["countdown"],
-        "direction": get_direction(line)
+        "countdown": int(line["departures"]["departure"][0]["departureTime"]["countdown"]),
+        "direction": get_direction(line),
     }
     return ret
+
 
 def get_rt_data():
     data_list = []

@@ -24,12 +24,7 @@ import const as Const
 class LCD:
     """Driver for the Liquid Crystal LCD displays that use the I2C bus"""
 
-    def __init__(self,
-                 addr: int,
-                 cols: int,
-                 rows: int,
-                 charsize: int = 0x00,
-                 i2c: Optional[I2C] = None) -> None:
+    def __init__(self, addr: int, cols: int, rows: int, charsize: int = 0x00, i2c: Optional[I2C] = None) -> None:
         """
         Constructs a new instance.
 
@@ -128,7 +123,7 @@ class LCD:
         :param      position:  The cursor position
         :type       position:  Tuple[int, int]
         """
-        self.set_cursor(col=position[0], row=position[1])   # (x, y)
+        self.set_cursor(col=position[0], row=position[1])  # (x, y)
 
     def begin(self) -> None:
         """
@@ -136,8 +131,7 @@ class LCD:
 
         Must be called before anything else is done
         """
-        self._display_function = \
-            Const.LCD_4BITMODE | Const.LCD_1LINE | Const.LCD_5x8DOTS
+        self._display_function = Const.LCD_4BITMODE | Const.LCD_1LINE | Const.LCD_5x8DOTS
 
         if self.rows > 1:
             self._display_function |= Const.LCD_2LINE
@@ -173,16 +167,14 @@ class LCD:
         self._command(value=(Const.LCD_FUNCTIONSET | self._display_function))
 
         # turn the display on with no cursor or blinking default
-        self._display_control = \
-            Const.LCD_DISPLAYON | Const.LCD_CURSOROFF | Const.LCD_BLINKOFF
+        self._display_control = Const.LCD_DISPLAYON | Const.LCD_CURSOROFF | Const.LCD_BLINKOFF
         self.display()
 
         # clear it off
         self.clear()
 
         # Initialize to default text direction (for roman languages)
-        self._display_mode = \
-            Const.LCD_ENTRYLEFT | Const.LCD_ENTRYSHIFTDECREMENT
+        self._display_mode = Const.LCD_ENTRYLEFT | Const.LCD_ENTRYSHIFTDECREMENT
 
         # set the entry mode
         self._command(value=(Const.LCD_ENTRYMODESET | self._display_mode))
@@ -198,8 +190,8 @@ class LCD:
         """
         # clear display and set cursor position to zero
         self._command(value=Const.LCD_CLEARDISPLAY)
-        sleep_ms(2)     # this command takes a long time!
-        self._cursor_position = (0, 0)   # (x, y)
+        sleep_ms(2)  # this command takes a long time!
+        self._cursor_position = (0, 0)  # (x, y)
 
     def home(self) -> None:
         """
@@ -210,8 +202,8 @@ class LCD:
         """
         # set cursor position to zero
         self._command(value=Const.LCD_RETURNHOME)
-        sleep_ms(2)     # this command takes a long time!
-        self._cursor_position = (0, 0)   # (x, y)
+        sleep_ms(2)  # this command takes a long time!
+        self._cursor_position = (0, 0)  # (x, y)
 
     def no_display(self) -> None:
         """
@@ -295,7 +287,7 @@ class LCD:
         """
         self.no_cursor()
 
-    def set_cursor(self, col: int, row: int) -> None:
+    def set_cursor(self, col: int, row: int, row_offsets=None) -> None:
         """
         Set the cursor
 
@@ -304,21 +296,20 @@ class LCD:
         :param      row:  The new row of the cursor
         :type       row:  int
         """
-        row_offsets: List[int] = [0, 20, 40, 60] 
+        if row_offsets is None:
+            row_offsets: List[int] = [0, 0x3C, 0x14, 0x54]
 
         # we count rows starting w/0
         if row > (self.rows - 1):
             row = self.rows - 1
 
-        self._command(
-            value=(Const.LCD_SETDDRAMADDR | (col + row_offsets[row]))
-        )
+        self._command(value=(Const.LCD_SETDDRAMADDR | (col + row_offsets[row])))
 
-        self._cursor_position = (col, row)   # (x, y)
+        self._cursor_position = (col, row)  # (x, y)
 
     def scroll_display_left(self) -> None:
         """Scroll the display to the left by one"""
-        self._command(value=(Const.LCD_CURSORSHIFT | Const.LCD_DISPLAYMOVE | Const.LCD_MOVELEFT))   # noqa: E501
+        self._command(value=(Const.LCD_CURSORSHIFT | Const.LCD_DISPLAYMOVE | Const.LCD_MOVELEFT))  # noqa: E501
 
     def scroll_display_right(self) -> None:
         """Scroll the display to the right by one"""
@@ -352,9 +343,9 @@ class LCD:
         :type       new_val:  Union[int, bool]
         """
         if new_val:
-            self.backlight()        # turn backlight on
+            self.backlight()  # turn backlight on
         else:
-            self.no_backlight()     # turn backlight off
+            self.no_backlight()  # turn backlight off
 
     def get_backlight(self) -> bool:
         """
@@ -384,7 +375,7 @@ class LCD:
         :param      charmap:   The charmap aka custom character
         :type       charmap:   List[int]
         """
-        location &= 0x7     # we only have 8, locations 0-7
+        location &= 0x7  # we only have 8, locations 0-7
 
         self._command(value=(Const.LCD_SETCGRAMADDR | location << 3))
         sleep_us(40)
