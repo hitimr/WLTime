@@ -9,6 +9,12 @@ NUM_COLS = 20
 NUM_ROWS = 4
 UPDATE_INTERVAL = 30  # seconds
 
+
+di_btn_sens = Pin(34, Pin.IN)
+do_keep_alive = Pin(23, Pin.OUT)
+do_keep_alive.value(1)
+
+
 # define custom I2C interface, default is 'I2C(0)'
 # check the docs of your device for further details and pin infos
 i2c = I2C(0, scl=Pin(22), sda=Pin(21), freq=800000)
@@ -61,13 +67,21 @@ def print_rt_data():
 
 lcd.print("Fetching initial data..")
 print_rt_data()
-iter = 0
+
+iter = 1
+max_iter = 10
+
 while True:
     if iter % UPDATE_INTERVAL == 0:
         print_rt_data()
-        iter = 0
+
+    do_keep_alive.value(iter % 2)
+    # if iter >= max_iter:
+    #     do_keep_alive.value(0)
 
     lcd.set_cursor(0, 4)
+    lcd.print(" " * 20)
+    lcd.set_cursor(0, 4)
     lcd.print(f"Next update: {UPDATE_INTERVAL - iter}s")
-    time.sleep(1)
     iter += 1
+    time.sleep(1)
